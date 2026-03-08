@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&#x05DE;&#x05E9;&#x05D7;&#x05E7; &#x05D6;&#x05D9;&#x05DB;&#x05E8;&#x05D5;&#x05DF; &#x2014; &#x05EA;&#x05E8;&#x05D1;&#x05D5;&#x05EA; &#x05D0;&#x05E8;&#x05D2;&#x05D5;&#x05E0;&#x05D9;&#x05EA;</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a2332;color:#e8e0d0;font-family:'Heebo',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:36px 20px 40px}
+header{text-align:center;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #2e4460;width:100%;max-width:980px}
+h1{font-size:2.2rem;font-weight:900;color:#d4c5a9;margin-bottom:8px;letter-spacing:-0.5px}
+.subtitle{font-size:1rem;color:#7a90aa;font-weight:300}
+.stats{display:flex;gap:48px;justify-content:center;margin-bottom:24px;font-size:1.05rem;color:#7a90aa;font-weight:400}
+.stat-item span{color:#d4c5a9;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:980px;width:100%}
+.card{height:165px;cursor:pointer;perspective:1000px}
+.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s ease}
+.card.flipped .card-inner,.card.matched .card-inner{transform:rotateY(180deg)}
+.card-front,.card-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:14px;text-align:center}
+.card-front{background:#243447;border:1px solid #2e4460;flex-direction:column;gap:8px}
+.card-front-icon{font-size:2.2rem;color:#2e4460}
+.card-front-label{font-size:.72rem;letter-spacing:2px;color:#2e4460;font-weight:500}
+.card-back{background:#1e3a52;border:1px solid #4a6580;transform:rotateY(180deg);flex-direction:column;gap:8px}
+.card-back.term{background:#263d5c;border-color:#c4b49a}
+.card-back.definition{background:#1e3348;border-color:#4a6580}
+.card-label{font-size:.68rem;letter-spacing:1.5px;color:#7a90aa;padding-bottom:6px;border-bottom:1px solid #2e4460;width:100%;font-weight:500}
+.card-back.term .card-label{color:#c4b49a;border-bottom-color:#4a6580}
+.card-text{font-size:.9rem;line-height:1.6;color:#cfd8e3;font-weight:400}
+.card-back.term .card-text{font-size:1.15rem;font-weight:700;color:#d4c5a9}
+.card.matched .card-back{background:#1c3826!important;border-color:#4caf50!important}
+.card.matched .card-text{color:#81c784!important}
+.card.matched .card-label{color:#4caf50!important;border-bottom-color:#2d5c32!important}
+.message{min-height:36px;margin-top:22px;font-size:1.1rem;color:#7a90aa;text-align:center;font-weight:400}
+.message.correct{color:#81c784;font-weight:500}
+.message.wrong{color:#e57373}
+.message.win{color:#d4c5a9;font-size:1.4rem;font-weight:700}
+.footer{margin-top:10px;font-size:.72rem;color:#3d5166;text-align:center;font-weight:300}
+.btn-restart{margin-top:16px;padding:10px 32px;background:transparent;border:1px solid #2e4460;color:#7a90aa;font-family:'Heebo',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;border-radius:4px;transition:all .2s;letter-spacing:0.5px}
+.btn-restart:hover{border-color:#7a90aa;color:#d4c5a9}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#x05EA;&#x05E8;&#x05D1;&#x05D5;&#x05EA; &#x05D0;&#x05E8;&#x05D2;&#x05D5;&#x05E0;&#x05D9;&#x05EA; &#x2014; &#x05DE;&#x05E9;&#x05D7;&#x05E7; &#x05D6;&#x05D9;&#x05DB;&#x05E8;&#x05D5;&#x05DF;</h1>
+  <div class="subtitle">&#x05D4;&#x05EA;&#x05D0;&#x05DD; &#x05DB;&#x05DC; &#x05DE;&#x05D5;&#x05E9;&#x05D2; &#x05DC;&#x05D4;&#x05D2;&#x05D3;&#x05E8;&#x05EA;&#x05D5; &#x05D4;&#x05DE;&#x05D3;&#x05D5;&#x05D9;&#x05E7;&#x05EA;</div>
+</header>
+<div class="stats">
+  <div class="stat-item">&#x05E0;&#x05D9;&#x05E1;&#x05D9;&#x05D5;&#x05E0;&#x05D5;&#x05EA;: <span id="attempts">0</span></div>
+  <div class="stat-item">&#x05D6;&#x05D5;&#x05D2;&#x05D5;&#x05EA;: <span id="matches">0</span> / 8</div>
+</div>
+<div class="grid" id="grid"></div>
+<div class="message" id="message"></div>
+<button class="btn-restart" onclick="initGame()">&#x05D4;&#x05EA;&#x05D7;&#x05DC; &#x05DE;&#x05D7;&#x05D3;&#x05E9;</button>
+<div class="footer">&#x05DE;&#x05E7;&#x05D5;&#x05E8;&#x05D5;&#x05EA;: &#x05D4;&#x05DE;&#x05DB;&#x05DC;&#x05D5;&#x05DC; | &#x05D0;&#x05D5;&#x05E0;&#x05D9;&#x05D1;&#x05E8;&#x05E1;&#x05D9;&#x05D8;&#x05D4; &#x05D4;&#x05E4;&#x05EA;&#x05D5;&#x05D7;&#x05D4; &#x2014; &#x05D9;&#x05D7;&#x05D9;&#x05D3;&#x05D4; 9 &#x05EA;&#x05E8;&#x05D1;&#x05D5;&#x05EA; &#x05D4;&#x05D0;&#x05E8;&#x05D2;&#x05D5;&#x05DF; | Textologia</div>
+
+<script>
+const pairs = [
+  {
+    term:"\u05ea\u05e8\u05d1\u05d5\u05ea \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05ea",
+    definition:"\u05de\u05db\u05dc\u05d5\u05dc \u05de\u05d5\u05e8\u05db\u05d1 \u05e9\u05dc \u05e2\u05e8\u05db\u05d9\u05dd, \u05e0\u05d5\u05e8\u05de\u05d5\u05ea, \u05e1\u05de\u05dc\u05d9\u05dd, \u05e9\u05e4\u05d4 \u05d5\u05d0\u05de\u05d5\u05e0\u05d5\u05ea \u05d4\u05de\u05e9\u05d5\u05ea\u05e4\u05d9\u05dd \u05dc\u05db\u05dc \u05d7\u05d1\u05e8\u05d9 \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05d5\u05de\u05d9\u05d9\u05d7\u05d3\u05d9\u05dd \u05d0\u05d5\u05ea\u05d5"
+  },
+  {
+    term:"\u05d4\u05e0\u05d7\u05d5\u05ea \u05d9\u05e1\u05d5\u05d3",
+    definition:"\u05d0\u05de\u05d9\u05ea\u05d5\u05ea \u05e2\u05de\u05d5\u05e7\u05d5\u05ea \u05d5\u05d1\u05dc\u05ea\u05d9 \u05de\u05d5\u05d3\u05e2\u05d5\u05ea \u05d4\u05de\u05e0\u05d7\u05d5\u05ea \u05d0\u05ea \u05d4\u05ea\u05e0\u05d4\u05d2\u05d5\u05ea \u05d4\u05e2\u05d5\u05d1\u05d3\u05d9\u05dd; \u05d4\u05e8\u05d5\u05d1\u05d3 \u05d4\u05e1\u05de\u05d5\u05d9 \u05d1\u05d9\u05d5\u05ea\u05e8 \u05d1\u05ea\u05e8\u05d1\u05d5\u05ea \u05e2\u05dc \u05e4\u05d9 \u05de\u05d5\u05d3\u05dc \u05e9\u05d9\u05d9\u05df"
+  },
+  {
+    term:"\u05e2\u05e8\u05db\u05d9\u05dd \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05d9\u05dd",
+    definition:"\u05d0\u05de\u05d5\u05ea \u05de\u05d9\u05d3\u05d4 \u05de\u05d5\u05e1\u05e8\u05d9\u05d5\u05ea \u05d5\u05d0\u05d9\u05d3\u05d0\u05d5\u05dc\u05d5\u05d2\u05d9\u05d5\u05ea \u05e9\u05e2\u05dc \u05e4\u05d9\u05d4\u05df \u05e9\u05d5\u05e4\u05d8\u05d9\u05dd \u05d7\u05d1\u05e8\u05d9 \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05de\u05e2\u05e9\u05d9\u05dd \u05d5\u05de\u05d7\u05d3\u05dc\u05d9\u05dd \u05e9\u05dc \u05e2\u05e6\u05de\u05dd \u05d5\u05e9\u05dc \u05d6\u05d5\u05dc\u05ea\u05dd"
+  },
+  {
+    term:"\u05e0\u05d5\u05e8\u05de\u05d5\u05ea \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05d5\u05ea",
+    definition:"\u05db\u05dc\u05dc\u05d9 \u05d4\u05ea\u05e0\u05d4\u05d2\u05d5\u05ea \u05d4\u05e0\u05d2\u05d6\u05e8\u05d9\u05dd \u05de\u05d4\u05e0\u05d7\u05d5\u05ea \u05d4\u05d9\u05e1\u05d5\u05d3 \u05d5\u05de\u05d4\u05e2\u05e8\u05db\u05d9\u05dd, \u05d4\u05de\u05d2\u05d3\u05d9\u05e8\u05d9\u05dd \u05de\u05d4 \u05e8\u05d0\u05d5\u05d9 \u05dc\u05e2\u05e9\u05d5\u05ea \u05d5\u05de\u05d4 \u05d9\u05e9 \u05dc\u05d4\u05d9\u05de\u05e0\u05e2 \u05de\u05de\u05e0\u05d5"
+  },
+  {
+    term:"\u05d0\u05e7\u05dc\u05d9\u05dd \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9",
+    definition:"\u05ea\u05e4\u05d9\u05e1\u05d5\u05ea \u05de\u05e9\u05d5\u05ea\u05e4\u05d5\u05ea \u05e9\u05dc \u05d7\u05d1\u05e8\u05d9 \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05d4\u05de\u05e9\u05e7\u05e4\u05d5\u05ea \u05db\u05d9\u05e6\u05d3 \u05d4\u05dd \u05de\u05e4\u05e8\u05e9\u05d9\u05dd \u05d0\u05ea \u05e1\u05d1\u05d9\u05d1\u05ea\u05dd \u05d1\u05de\u05de\u05d3\u05d9\u05dd \u05db\u05d2\u05d5\u05df \u05d0\u05de\u05d5\u05df, \u05ea\u05de\u05d9\u05db\u05d4 \u05d5\u05d4\u05d5\u05d2\u05e0\u05d5\u05ea"
+  },
+  {
+    term:"\u05e1\u05de\u05dc\u05d9\u05dd \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05d9\u05dd",
+    definition:"\u05d0\u05dc\u05de\u05e0\u05d8\u05d9\u05dd \u05d2\u05dc\u05d5\u05d9\u05d9\u05dd \u05d5\u05de\u05d5\u05d7\u05e9\u05d9\u05d9\u05dd \u2014 \u05d7\u05e4\u05e6\u05d9\u05dd, \u05e9\u05e4\u05d4, \u05dc\u05d1\u05d5\u05e9, \u05e2\u05d9\u05e6\u05d5\u05d1 \u05de\u05e8\u05d7\u05d1 \u2014 \u05d4\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05de\u05e9\u05de\u05e2\u05d5\u05d9\u05d5\u05ea \u05d5\u05de\u05d1\u05d8\u05d0\u05d9\u05dd \u05d0\u05ea \u05e2\u05e8\u05db\u05d9 \u05d4\u05d0\u05e8\u05d2\u05d5\u05df"
+  },
+  {
+    term:"\u05d8\u05e7\u05e1\u05d9\u05dd \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05d9\u05dd",
+    definition:"\u05e1\u05d3\u05e8\u05d5\u05ea \u05de\u05ea\u05d5\u05db\u05e0\u05e0\u05d5\u05ea \u05e9\u05dc \u05e4\u05e2\u05d9\u05dc\u05d5\u05d9\u05d5\u05ea \u05d8\u05e2\u05d5\u05e0\u05d5\u05ea \u05de\u05e9\u05de\u05e2\u05d5\u05ea \u05d4\u05de\u05ea\u05e7\u05d9\u05d9\u05de\u05d5\u05ea \u05d1\u05ea\u05d3\u05d9\u05e8\u05d5\u05ea \u05e7\u05d1\u05d5\u05e2\u05d4 \u05d5\u05de\u05d7\u05d6\u05e7\u05d5\u05ea \u05d0\u05ea \u05d6\u05d4\u05d5\u05ea \u05d4\u05d0\u05e8\u05d2\u05d5\u05df"
+  },
+  {
+    term:"\u05ea\u05e8\u05d1\u05d5\u05ea \u05de\u05e9\u05e0\u05d4",
+    definition:"\u05d3\u05e4\u05d5\u05e1\u05d9 \u05e2\u05e8\u05db\u05d9\u05dd \u05d5\u05e0\u05d5\u05e8\u05de\u05d5\u05ea \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9\u05d9\u05dd \u05d4\u05de\u05ea\u05e4\u05ea\u05d7\u05d9\u05dd \u05d1\u05ea\u05d5\u05da \u05e7\u05d1\u05d5\u05e6\u05d5\u05ea \u05e9\u05d5\u05e0\u05d5\u05ea \u05d1\u05ea\u05d5\u05da \u05d0\u05e8\u05d2\u05d5\u05df, \u05dc\u05e6\u05d3 \u05d4\u05ea\u05e8\u05d1\u05d5\u05ea \u05d4\u05db\u05dc\u05dc\u05d9\u05ea"
+  }
+];
+
+let flipped=[],matched=0,attempts=0,locked=false;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function setMessage(text,cls){
+  const el=document.getElementById('message');
+  el.textContent=text;
+  el.className='message'+(cls?' '+cls:'');
+}
+
+function initGame(){
+  document.getElementById('grid').innerHTML='';
+  flipped=[];matched=0;attempts=0;locked=false;
+  document.getElementById('attempts').textContent='0';
+  document.getElementById('matches').textContent='0';
+  setMessage('');
+  const cardData=[];
+  pairs.forEach((p,i)=>{
+    cardData.push({type:'term',text:p.term,pairId:i});
+    cardData.push({type:'definition',text:p.definition,pairId:i});
+  });
+  shuffle(cardData).forEach(card=>{
+    const el=document.createElement('div');
+    el.className='card';
+    el.dataset.pairId=card.pairId;
+    el.dataset.type=card.type;
+    const label=card.type==='term'?'\u05de\u05d5\u05e9\u05d2':'\u05d4\u05d2\u05d3\u05e8\u05d4';
+    el.innerHTML='<div class="card-inner">'
+      +'<div class="card-front">'
+      +'<div class="card-front-icon">&#9670;</div>'
+      +'<div class="card-front-label">\u05ea\u05e8\u05d1\u05d5\u05ea \u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05ea</div>'
+      +'</div>'
+      +'<div class="card-back '+card.type+'">'
+      +'<div class="card-label">'+label+'</div>'
+      +'<div class="card-text">'+card.text+'</div>'
+      +'</div></div>';
+    el.addEventListener('click',()=>flipCard(el));
+    document.getElementById('grid').appendChild(el);
+  });
+}
+
+function flipCard(el){
+  if(locked||el.classList.contains('flipped')||el.classList.contains('matched')||flipped.length===2)return;
+  el.classList.add('flipped');
+  flipped.push(el);
+  if(flipped.length===2){
+    attempts++;
+    document.getElementById('attempts').textContent=attempts;
+    checkMatch();
+  }
+}
+
+function checkMatch(){
+  const[a,b]=flipped;
+  if(a.dataset.pairId===b.dataset.pairId&&a.dataset.type!==b.dataset.type){
+    a.classList.add('matched');b.classList.add('matched');
+    matched++;
+    document.getElementById('matches').textContent=matched;
+    flipped=[];
+    setMessage('\u05d4\u05ea\u05d0\u05de\u05d4 \u05e0\u05db\u05d5\u05e0\u05d4','correct');
+    if(matched===8){
+      setTimeout(()=>setMessage('\u05e1\u05d9\u05d9\u05de\u05ea! \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea: '+attempts+' \u2014 \u05db\u05dc \u05d4\u05db\u05d1\u05d5\u05d3','win'),600);
+    } else {
+      setTimeout(()=>setMessage(''),1200);
+    }
+  } else {
+    locked=true;
+    setMessage('\u05dc\u05d0 \u05ea\u05d5\u05d0\u05dd \u2014 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1','wrong');
+    setTimeout(()=>{
+      a.classList.remove('flipped');b.classList.remove('flipped');
+      flipped=[];locked=false;setMessage('');
+    },1100);
+  }
+}
+
+initGame();
+</script>
+</body>
+</html>
