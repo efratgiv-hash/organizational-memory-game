@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק זיכרון - תרבות ארגונית</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a2332;
+            --accent: #d4c5a9;
+            --bg: #f4f4f9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--primary);
+            color: var(--white);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* מסך הוראות מקדימות */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(26, 35, 50, 0.98);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            color: var(--primary);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .start-btn {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover { transform: scale(1.1); background: #c5b498; }
+
+        /* לוח המשחק */
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 20px;
+            max-width: 700px;
+        }
+
+        .card {
+            width: 140px; height: 140px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%; height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .card-front { background: var(--accent); color: var(--primary); font-size: 2rem; }
+        .card-back { background: var(--white); color: var(--primary); transform: rotateY(180deg); border: 3px solid var(--accent); }
+        .card.matched .card-back { background: #e0ffe0; border-color: #4CAF50; }
+
+    </style>
+</head>
+<body>
+
+    <div id="modal-overlay">
+        <div class="modal-content">
+            <h1 style="font-weight: 900;">משחק הזיכרון הארגוני</h1>
+            <p>התאימו בין המושגים להגדרות שלהם לפי מודל שיין.</p>
+            <p>מוכנה לאתגר את הסטודנטים?</p>
+            <button class="start-btn" onclick="startGame()">מתחילים!</button>
+        </div>
+    </div>
+
+    <h1 style="margin-top: 30px; font-weight: 900; color: var(--accent);">תרבות ארגונית - מודל שיין</h1>
+
+    <div class="game-container" id="game-board"></div>
+
+    <audio id="bg-music" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
+    <audio id="flip-sound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+    <audio id="match-sound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <script>
+        const cardsData = [
+            { t: "ארטיפקטים", m: "הרובד הגלוי: טקסים, לבוש, מבנה" },
+            { t: "ערכים מוצהרים", m: "אידיאולוגיות, נורמות ומטרות" },
+            { t: "הנחות יסוד", m: "הרובד הסמוי: תפיסות לא מודעות" },
+            { t: "מודל שיין", m: "תיאוריית 3 רבדי התרבות הארגונית" },
+            { t: "טקסים", m: "אירועים חוזרים המבטאים ערכים" },
+            { t: "מיתוסים", m: "סיפורים המעצבים את זהות הארגון" }
+        ];
+
+        let gameCards = [];
+        cardsData.forEach(item => {
+            gameCards.push({ text: item.t, pairId: item.t });
+            gameCards.push({ text: item.m, pairId: item.t });
+        });
+
+        function startGame() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            const music = document.getElementById('bg-music');
+            music.volume = 0.15;
+            music.play();
+            initBoard();
+        }
+
+        function initBoard() {
+            const board = document.getElementById('game-board');
+            gameCards.sort(() => Math.random() - 0.5);
+            gameCards.forEach(data => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">?</div>
+                        <div class="card-back">${data.text}</div>
+                    </div>`;
+                card.onclick = () => flip(card, data.pairId);
+                board.appendChild(card);
+            });
+        }
+
+        let flipped = [];
+        function flip(card, id) {
+            if (flipped.length < 2 && !card.classList.contains('flipped')) {
+                document.getElementById('flip-sound').play();
+                card.classList.add('flipped');
+                flipped.push({card, id});
+                if (flipped.length === 2) checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flipped;
+            if (c1.id === c2.id) {
+                document.getElementById('match-sound').play();
+                c1.card.classList.add('matched');
+                c2.card.classList.add('matched');
+                flipped = [];
+            } else {
+                setTimeout(() => {
+                    c1.card.classList.remove('flipped');
+                    c2.card.classList.remove('flipped');
+                    flipped = [];
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
